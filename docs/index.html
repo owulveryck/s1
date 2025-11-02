@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercices de Mathématiques</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+        }
+
+        .exercises-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .exercise-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .exercise-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .exercise-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .exercise-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .exercise-description {
+            color: #666;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #667eea;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Exercices de Mathématiques</h1>
+
+        <div class="exercises-grid">
+            <a href="nombres/index.html" class="exercise-card">
+                <div class="exercise-icon">🏛️</div>
+                <div class="exercise-title">Chiffres Romains</div>
+                <div class="exercise-description">
+                    Apprenez à convertir les chiffres arabes en chiffres romains et vice-versa.
+                    Plusieurs niveaux de difficulté disponibles.
+                </div>
+            </a>
+
+            <a href="decennies/index.html" class="exercise-card">
+                <div class="exercise-icon">📅</div>
+                <div class="exercise-title">Décennies et Siècles</div>
+                <div class="exercise-description">
+                    Maîtrisez les conversions entre années, décennies, siècles et millénaires.
+                    Travaillez avec des nombres entiers et décimaux.
+                </div>
+            </a>
+        </div>
+
+        <div class="footer">
+            Choisissez un exercice pour commencer votre entraînement !
+        </div>
+    </div>
+</body>
+</html>
