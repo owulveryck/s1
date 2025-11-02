@@ -61,7 +61,7 @@
             transition: border-color 0.3s;
         }
 
-        input[type="number"]:focus, input[type="text"]:focus {
+        input[type="number"]:focus, input[type="text"]:focus, select:focus {
             outline: none;
             border-color: #667eea;
         }
@@ -323,7 +323,16 @@
 
             <div class="input-group">
                 <label for="answer">Votre réponse :</label>
-                <input type="text" id="answer" autocomplete="off" placeholder="Ex: 5 décennies ou 50 ans">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="number" id="answerNumber" autocomplete="off" placeholder="Nombre" style="flex: 1;">
+                    <select id="answerUnit" style="flex: 1; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
+                        <option value="">Choisir l'unité...</option>
+                        <option value="ans">ans</option>
+                        <option value="décennies">décennies</option>
+                        <option value="siècles">siècles</option>
+                        <option value="millénaires">millénaires</option>
+                    </select>
+                </div>
             </div>
 
             <button id="validateBtn">Valider</button>
@@ -369,7 +378,8 @@
                     startBtn: document.getElementById('startBtn'),
                     questionNumber: document.getElementById('questionNumber'),
                     instruction: document.getElementById('instruction'),
-                    answerInput: document.getElementById('answer'),
+                    answerNumber: document.getElementById('answerNumber'),
+                    answerUnit: document.getElementById('answerUnit'),
                     validateBtn: document.getElementById('validateBtn'),
                     nextBtn: document.getElementById('nextBtn'),
                     feedback: document.getElementById('feedback'),
@@ -397,7 +407,9 @@
                 this.elements.validateBtn.addEventListener('click', () => this.validateAnswer());
                 this.elements.nextBtn.addEventListener('click', () => this.nextQuestion());
                 this.elements.restartBtn.addEventListener('click', () => this.restartGame());
-                this.elements.answerInput.addEventListener('keypress', (e) => {
+
+                // Enter key support
+                const enterHandler = (e) => {
                     if (e.key === 'Enter') {
                         if (this.elements.validateBtn.style.display !== 'none') {
                             this.validateAnswer();
@@ -405,7 +417,9 @@
                             this.nextQuestion();
                         }
                     }
-                });
+                };
+                this.elements.answerNumber.addEventListener('keypress', enterHandler);
+                this.elements.answerUnit.addEventListener('keypress', enterHandler);
             }
 
             generateQuestion() {
@@ -485,9 +499,11 @@
                 this.elements.instruction.textContent = `Convertir en ${this.targetUnit}`;
 
                 // Réinitialiser l'interface
-                this.elements.answerInput.value = '';
-                this.elements.answerInput.focus();
-                this.elements.answerInput.disabled = false;
+                this.elements.answerNumber.value = '';
+                this.elements.answerUnit.value = this.targetUnit;
+                this.elements.answerNumber.focus();
+                this.elements.answerNumber.disabled = false;
+                this.elements.answerUnit.disabled = false;
                 this.elements.feedback.classList.remove('show', 'correct', 'incorrect');
                 this.elements.validateBtn.style.display = '';
                 this.elements.validateBtn.disabled = false;
@@ -498,44 +514,40 @@
                 this.elements.scoreDisplay.textContent = this.score;
             }
 
-            parseAnswer(answer) {
-                // Nettoyer la réponse
-                answer = answer.trim().toLowerCase();
-
-                // Extraire le nombre (peut être décimal)
-                const match = answer.match(/^([\d.,]+)/);
-                if (!match) return null;
-
-                // Remplacer la virgule par un point pour le parsing
-                const numberStr = match[1].replace(',', '.');
-                const number = parseFloat(numberStr);
-
-                if (isNaN(number)) return null;
-
-                return number;
-            }
-
             validateAnswer() {
-                const userAnswer = this.elements.answerInput.value.trim();
+                const userNumber = this.elements.answerNumber.value.trim();
+                const userUnit = this.elements.answerUnit.value;
 
-                if (!userAnswer) {
-                    alert('Veuillez entrer une réponse');
+                if (!userNumber) {
+                    alert('Veuillez entrer un nombre');
                     return;
                 }
 
-                const parsedAnswer = this.parseAnswer(userAnswer);
+                if (!userUnit) {
+                    alert('Veuillez choisir une unité');
+                    return;
+                }
 
-                if (parsedAnswer === null) {
-                    alert('Format de réponse invalide. Exemple: 5 ou 5.5');
+                const parsedNumber = parseFloat(userNumber.replace(',', '.'));
+
+                if (isNaN(parsedNumber)) {
+                    alert('Nombre invalide');
+                    return;
+                }
+
+                // Vérifier que l'unité choisie est correcte
+                if (userUnit !== this.targetUnit) {
+                    alert(`Veuillez répondre en ${this.targetUnit}`);
                     return;
                 }
 
                 // Comparer avec une tolérance pour les décimales
                 const tolerance = 0.01;
-                const isCorrect = Math.abs(parsedAnswer - this.currentAnswer) < tolerance;
+                const isCorrect = Math.abs(parsedNumber - this.currentAnswer) < tolerance;
 
-                // Désactiver l'input et le bouton valider
-                this.elements.answerInput.disabled = true;
+                // Désactiver les inputs et le bouton valider
+                this.elements.answerNumber.disabled = true;
+                this.elements.answerUnit.disabled = true;
                 this.elements.validateBtn.style.display = 'none';
                 this.elements.nextBtn.style.display = '';
 
