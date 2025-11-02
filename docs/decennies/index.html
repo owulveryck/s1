@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entraînement Décennies, Siècles et Millénaires</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .settings {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .game-area {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .game-area.active {
+            display: block;
+        }
+
+        .question-box {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .instruction {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .answer-display {
+            margin-top: 15px;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .explanation {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: left;
+            border-left: 4px solid #667eea;
+        }
+
+        .explanation-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .calculation {
+            font-size: 18px;
+            margin: 10px 0;
+            font-family: monospace;
+            line-height: 1.6;
+        }
+
+        .next-btn {
+            margin-top: 15px;
+            background: #28a745;
+        }
+
+        .next-btn:hover {
+            background: #218838;
+        }
+
+        .difficulty-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-btn {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            color: #333;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .difficulty-btn:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .difficulty-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .difficulty-info {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .game-over {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .game-over.show {
+            display: block;
+        }
+
+        .game-over h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📅 Décennies, Siècles et Millénaires</h1>
+
+        <div class="settings" id="settings">
+            <div class="input-group">
+                <label>Niveau de difficulté :</label>
+                <div class="difficulty-buttons">
+                    <div>
+                        <button type="button" class="difficulty-btn selected" data-difficulty="easy">
+                            Facile
+                        </button>
+                        <div class="difficulty-info">Nombres simples</div>
+                    </div>
+                    <div>
+                        <button type="button" class="difficulty-btn" data-difficulty="medium">
+                            Moyen
+                        </button>
+                        <div class="difficulty-info">Nombres mixtes</div>
+                    </div>
+                    <div>
+                        <button type="button" class="difficulty-btn" data-difficulty="hard">
+                            Difficile
+                        </button>
+                        <div class="difficulty-info">Décimales</div>
+                    </div>
+                </div>
+            </div>
+            <button id="startBtn">Commencer</button>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">Question</div>
+                    <div class="stat-value" id="currentQuestion">1</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Réussites</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question" id="questionNumber"></div>
+                <div class="instruction" id="instruction"></div>
+            </div>
+
+            <div class="feedback" id="feedback">
+                <div id="feedbackText"></div>
+                <div class="answer-display" id="answerDisplay"></div>
+            </div>
+
+            <div class="input-group">
+                <label for="answer">Votre réponse :</label>
+                <input type="text" id="answer" autocomplete="off" placeholder="Ex: 5 décennies ou 50 ans">
+            </div>
+
+            <button id="validateBtn">Valider</button>
+            <button id="nextBtn" class="next-btn" style="display: none;">Question suivante</button>
+
+            <div class="game-over" id="gameOver">
+                <h2>Partie terminée !</h2>
+                <div class="final-score" id="finalScore"></div>
+                <button id="restartBtn">Nouvelle partie</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class TimeConversionGame {
+            constructor() {
+                this.difficulty = 'easy';
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.totalQuestions = 10;
+                this.currentNumber = null;
+                this.currentUnit = null;
+                this.targetUnit = null;
+                this.currentAnswer = null;
+
+                // Unités disponibles
+                this.units = {
+                    'ans': { factor: 1, plural: 'ans', singular: 'an' },
+                    'décennies': { factor: 10, plural: 'décennies', singular: 'décennie' },
+                    'siècles': { factor: 100, plural: 'siècles', singular: 'siècle' },
+                    'millénaires': { factor: 1000, plural: 'millénaires', singular: 'millénaire' }
+                };
+
+                this.initElements();
+                this.attachEventListeners();
+            }
+
+            initElements() {
+                this.elements = {
+                    settings: document.getElementById('settings'),
+                    gameArea: document.getElementById('gameArea'),
+                    difficultyBtns: document.querySelectorAll('.difficulty-btn'),
+                    startBtn: document.getElementById('startBtn'),
+                    questionNumber: document.getElementById('questionNumber'),
+                    instruction: document.getElementById('instruction'),
+                    answerInput: document.getElementById('answer'),
+                    validateBtn: document.getElementById('validateBtn'),
+                    nextBtn: document.getElementById('nextBtn'),
+                    feedback: document.getElementById('feedback'),
+                    feedbackText: document.getElementById('feedbackText'),
+                    answerDisplay: document.getElementById('answerDisplay'),
+                    currentQuestionDisplay: document.getElementById('currentQuestion'),
+                    scoreDisplay: document.getElementById('score'),
+                    gameOver: document.getElementById('gameOver'),
+                    finalScore: document.getElementById('finalScore'),
+                    restartBtn: document.getElementById('restartBtn')
+                };
+            }
+
+            attachEventListeners() {
+                // Difficulty buttons
+                this.elements.difficultyBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.elements.difficultyBtns.forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        this.difficulty = btn.dataset.difficulty;
+                    });
+                });
+
+                this.elements.startBtn.addEventListener('click', () => this.startGame());
+                this.elements.validateBtn.addEventListener('click', () => this.validateAnswer());
+                this.elements.nextBtn.addEventListener('click', () => this.nextQuestion());
+                this.elements.restartBtn.addEventListener('click', () => this.restartGame());
+                this.elements.answerInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        if (this.elements.validateBtn.style.display !== 'none') {
+                            this.validateAnswer();
+                        } else {
+                            this.nextQuestion();
+                        }
+                    }
+                });
+            }
+
+            generateQuestion() {
+                const unitKeys = Object.keys(this.units);
+
+                // Choisir l'unité source et cible
+                let sourceUnitIndex = Math.floor(Math.random() * unitKeys.length);
+                let targetUnitIndex;
+                do {
+                    targetUnitIndex = Math.floor(Math.random() * unitKeys.length);
+                } while (targetUnitIndex === sourceUnitIndex);
+
+                this.currentUnit = unitKeys[sourceUnitIndex];
+                this.targetUnit = unitKeys[targetUnitIndex];
+
+                // Générer un nombre selon la difficulté
+                let value;
+                if (this.difficulty === 'easy') {
+                    // Nombres simples qui donnent des conversions entières
+                    const multipliers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+                    const multiplier = multipliers[Math.floor(Math.random() * multipliers.length)];
+
+                    if (this.units[this.currentUnit].factor < this.units[this.targetUnit].factor) {
+                        // Conversion vers une unité plus grande
+                        value = multiplier * this.units[this.targetUnit].factor / this.units[this.currentUnit].factor;
+                    } else {
+                        // Conversion vers une unité plus petite
+                        value = multiplier;
+                    }
+                } else if (this.difficulty === 'medium') {
+                    // Nombres qui peuvent donner des conversions avec décimales simples
+                    value = Math.floor(Math.random() * 50) + 1;
+                } else {
+                    // Nombres qui donnent souvent des décimales
+                    value = Math.floor(Math.random() * 100) + 1;
+                }
+
+                this.currentNumber = value;
+
+                // Calculer la réponse
+                const valueInYears = value * this.units[this.currentUnit].factor;
+                this.currentAnswer = valueInYears / this.units[this.targetUnit].factor;
+            }
+
+            formatUnit(value, unit) {
+                const unitInfo = this.units[unit];
+                if (value === 1) {
+                    return unitInfo.singular;
+                }
+                return unitInfo.plural;
+            }
+
+            startGame() {
+                this.currentQuestion = 0;
+                this.score = 0;
+
+                this.elements.settings.style.display = 'none';
+                this.elements.gameArea.classList.add('active');
+                this.elements.gameOver.classList.remove('show');
+
+                this.nextQuestion();
+            }
+
+            nextQuestion() {
+                this.currentQuestion++;
+
+                if (this.currentQuestion > this.totalQuestions) {
+                    this.endGame();
+                    return;
+                }
+
+                this.generateQuestion();
+
+                // Afficher la question
+                const unitText = this.formatUnit(this.currentNumber, this.currentUnit);
+                this.elements.questionNumber.textContent = `${this.currentNumber} ${unitText}`;
+                this.elements.instruction.textContent = `Convertir en ${this.targetUnit}`;
+
+                // Réinitialiser l'interface
+                this.elements.answerInput.value = '';
+                this.elements.answerInput.focus();
+                this.elements.answerInput.disabled = false;
+                this.elements.feedback.classList.remove('show', 'correct', 'incorrect');
+                this.elements.validateBtn.style.display = '';
+                this.elements.validateBtn.disabled = false;
+                this.elements.nextBtn.style.display = 'none';
+
+                // Mettre à jour les statistiques
+                this.elements.currentQuestionDisplay.textContent = this.currentQuestion;
+                this.elements.scoreDisplay.textContent = this.score;
+            }
+
+            parseAnswer(answer) {
+                // Nettoyer la réponse
+                answer = answer.trim().toLowerCase();
+
+                // Extraire le nombre (peut être décimal)
+                const match = answer.match(/^([\d.,]+)/);
+                if (!match) return null;
+
+                // Remplacer la virgule par un point pour le parsing
+                const numberStr = match[1].replace(',', '.');
+                const number = parseFloat(numberStr);
+
+                if (isNaN(number)) return null;
+
+                return number;
+            }
+
+            validateAnswer() {
+                const userAnswer = this.elements.answerInput.value.trim();
+
+                if (!userAnswer) {
+                    alert('Veuillez entrer une réponse');
+                    return;
+                }
+
+                const parsedAnswer = this.parseAnswer(userAnswer);
+
+                if (parsedAnswer === null) {
+                    alert('Format de réponse invalide. Exemple: 5 ou 5.5');
+                    return;
+                }
+
+                // Comparer avec une tolérance pour les décimales
+                const tolerance = 0.01;
+                const isCorrect = Math.abs(parsedAnswer - this.currentAnswer) < tolerance;
+
+                // Désactiver l'input et le bouton valider
+                this.elements.answerInput.disabled = true;
+                this.elements.validateBtn.style.display = 'none';
+                this.elements.nextBtn.style.display = '';
+
+                // Afficher le feedback
+                this.elements.feedback.classList.add('show');
+
+                if (isCorrect) {
+                    this.score++;
+                    this.elements.feedback.classList.add('correct');
+                    this.elements.feedbackText.textContent = '✓ Correct !';
+                    this.elements.answerDisplay.innerHTML = this.createExplanation();
+                } else {
+                    this.elements.feedback.classList.add('incorrect');
+                    this.elements.feedbackText.textContent = '✗ Incorrect';
+
+                    const answerText = this.formatAnswerText(this.currentAnswer);
+                    this.elements.answerDisplay.innerHTML = `<strong>La bonne réponse est : ${answerText}</strong>` + this.createExplanation();
+                }
+
+                // Mettre à jour le score
+                this.elements.scoreDisplay.textContent = this.score;
+            }
+
+            formatAnswerText(value) {
+                // Formater le nombre pour l'affichage
+                let formattedValue;
+                if (Number.isInteger(value)) {
+                    formattedValue = value.toString();
+                } else {
+                    formattedValue = value.toFixed(2).replace(/\.?0+$/, '');
+                }
+
+                const unitText = this.formatUnit(value, this.targetUnit);
+                return `${formattedValue} ${unitText}`;
+            }
+
+            createExplanation() {
+                let html = '<div class="explanation"><div class="explanation-title">Explication :</div>';
+
+                // Calculer la valeur en années
+                const valueInYears = this.currentNumber * this.units[this.currentUnit].factor;
+
+                html += '<div class="calculation">';
+
+                // Étape 1: Conversion vers les années
+                if (this.currentUnit !== 'ans') {
+                    const unitText = this.formatUnit(this.currentNumber, this.currentUnit);
+                    html += `${this.currentNumber} ${unitText} = ${this.currentNumber} × ${this.units[this.currentUnit].factor} ans<br>`;
+                    html += `= ${valueInYears} ans<br><br>`;
+                }
+
+                // Étape 2: Conversion vers l'unité cible
+                if (this.targetUnit !== 'ans') {
+                    html += `${valueInYears} ans = ${valueInYears} ÷ ${this.units[this.targetUnit].factor} ${this.targetUnit}<br>`;
+
+                    let result;
+                    if (Number.isInteger(this.currentAnswer)) {
+                        result = this.currentAnswer.toString();
+                    } else {
+                        result = this.currentAnswer.toFixed(4).replace(/\.?0+$/, '');
+                    }
+
+                    const targetUnitText = this.formatUnit(this.currentAnswer, this.targetUnit);
+                    html += `= ${result} ${targetUnitText}`;
+                } else {
+                    html += `= ${valueInYears} ans`;
+                }
+
+                html += '</div>';
+
+                // Ajouter un tableau de référence
+                html += '<div style="margin-top: 15px; font-size: 14px; color: #666;">';
+                html += '<strong>Rappel :</strong><br>';
+                html += '1 décennie = 10 ans<br>';
+                html += '1 siècle = 100 ans = 10 décennies<br>';
+                html += '1 millénaire = 1000 ans = 100 décennies = 10 siècles';
+                html += '</div>';
+
+                html += '</div>';
+                return html;
+            }
+
+            endGame() {
+                this.elements.gameArea.querySelector('.stats').style.display = 'none';
+                this.elements.gameArea.querySelector('.question-box').style.display = 'none';
+                this.elements.gameArea.querySelector('.input-group').style.display = 'none';
+                this.elements.validateBtn.style.display = 'none';
+                this.elements.feedback.classList.remove('show');
+
+                this.elements.gameOver.classList.add('show');
+                this.elements.finalScore.textContent = `${this.score} / ${this.totalQuestions}`;
+            }
+
+            restartGame() {
+                this.elements.gameArea.querySelector('.stats').style.display = '';
+                this.elements.gameArea.querySelector('.question-box').style.display = '';
+                this.elements.gameArea.querySelector('.input-group').style.display = '';
+                this.elements.validateBtn.style.display = '';
+
+                this.elements.settings.style.display = 'block';
+                this.elements.gameArea.classList.remove('active');
+            }
+        }
+
+        // Initialiser le jeu
+        const game = new TimeConversionGame();
+    </script>
+</body>
+</html>

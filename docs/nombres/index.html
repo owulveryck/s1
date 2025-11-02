@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entraînement Chiffres Romains</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .settings {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .game-area {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .game-area.active {
+            display: block;
+        }
+
+        .question-box {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .instruction {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .answer-display {
+            margin-top: 15px;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .explanation {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: left;
+            border-left: 4px solid #667eea;
+        }
+
+        .explanation-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .highlighted-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+
+        .calculation {
+            font-size: 18px;
+            margin: 10px 0;
+            font-family: monospace;
+            line-height: 1.6;
+        }
+
+        .next-btn {
+            margin-top: 15px;
+            background: #28a745;
+        }
+
+        .next-btn:hover {
+            background: #218838;
+        }
+
+        .difficulty-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-btn {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            color: #333;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .difficulty-btn:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .difficulty-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .difficulty-info {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .game-over {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            display: none;
+        }
+
+        .game-over.show {
+            display: block;
+        }
+
+        .game-over h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏛️ Chiffres Romains</h1>
+
+        <div class="settings" id="settings">
+            <div class="input-group">
+                <label>Niveau de difficulté :</label>
+                <div class="difficulty-buttons">
+                    <div>
+                        <button type="button" class="difficulty-btn selected" data-difficulty="easy">
+                            Facile
+                        </button>
+                        <div class="difficulty-info">1-20</div>
+                    </div>
+                    <div>
+                        <button type="button" class="difficulty-btn" data-difficulty="medium">
+                            Moyen
+                        </button>
+                        <div class="difficulty-info">1-100</div>
+                    </div>
+                    <div>
+                        <button type="button" class="difficulty-btn" data-difficulty="hard">
+                            Difficile
+                        </button>
+                        <div class="difficulty-info">1-1000</div>
+                    </div>
+                </div>
+            </div>
+            <button id="startBtn">Commencer</button>
+        </div>
+
+        <div class="game-area" id="gameArea">
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-label">Question</div>
+                    <div class="stat-value" id="currentQuestion">1</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Réussites</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+            </div>
+
+            <div class="question-box">
+                <div class="question" id="questionNumber"></div>
+                <div class="instruction" id="instruction"></div>
+            </div>
+
+            <div class="feedback" id="feedback">
+                <div id="feedbackText"></div>
+                <div class="answer-display" id="answerDisplay"></div>
+            </div>
+
+            <div class="input-group">
+                <label for="answer">Votre réponse :</label>
+                <input type="text" id="answer" autocomplete="off">
+            </div>
+
+            <button id="validateBtn">Valider</button>
+            <button id="nextBtn" class="next-btn" style="display: none;">Question suivante</button>
+
+            <div class="game-over" id="gameOver">
+                <h2>Partie terminée !</h2>
+                <div class="final-score" id="finalScore"></div>
+                <button id="restartBtn">Nouvelle partie</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class RomanNumeralGame {
+            constructor() {
+                this.difficulty = 'easy';
+                this.difficultyRanges = {
+                    easy: { min: 1, max: 20 },
+                    medium: { min: 1, max: 100 },
+                    hard: { min: 1, max: 1000 }
+                };
+                this.currentQuestion = 0;
+                this.score = 0;
+                this.totalQuestions = 10;
+                this.questionType = null; // 'toRoman' or 'toArabic'
+                this.currentNumber = null;
+                this.currentAnswer = null;
+
+                this.initElements();
+                this.attachEventListeners();
+            }
+
+            initElements() {
+                this.elements = {
+                    settings: document.getElementById('settings'),
+                    gameArea: document.getElementById('gameArea'),
+                    difficultyBtns: document.querySelectorAll('.difficulty-btn'),
+                    startBtn: document.getElementById('startBtn'),
+                    questionNumber: document.getElementById('questionNumber'),
+                    instruction: document.getElementById('instruction'),
+                    answerInput: document.getElementById('answer'),
+                    validateBtn: document.getElementById('validateBtn'),
+                    nextBtn: document.getElementById('nextBtn'),
+                    feedback: document.getElementById('feedback'),
+                    feedbackText: document.getElementById('feedbackText'),
+                    answerDisplay: document.getElementById('answerDisplay'),
+                    currentQuestionDisplay: document.getElementById('currentQuestion'),
+                    scoreDisplay: document.getElementById('score'),
+                    gameOver: document.getElementById('gameOver'),
+                    finalScore: document.getElementById('finalScore'),
+                    restartBtn: document.getElementById('restartBtn')
+                };
+            }
+
+            attachEventListeners() {
+                // Difficulty buttons
+                this.elements.difficultyBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.elements.difficultyBtns.forEach(b => b.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        this.difficulty = btn.dataset.difficulty;
+                    });
+                });
+
+                this.elements.startBtn.addEventListener('click', () => this.startGame());
+                this.elements.validateBtn.addEventListener('click', () => this.validateAnswer());
+                this.elements.nextBtn.addEventListener('click', () => this.nextQuestion());
+                this.elements.restartBtn.addEventListener('click', () => this.restartGame());
+                this.elements.answerInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        if (this.elements.validateBtn.style.display !== 'none') {
+                            this.validateAnswer();
+                        } else {
+                            this.nextQuestion();
+                        }
+                    }
+                });
+            }
+
+            toRoman(num) {
+                if (num < 1 || num > 3999) return '';
+
+                const values = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+                const symbols = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'];
+
+                let result = '';
+                for (let i = 0; i < values.length; i++) {
+                    while (num >= values[i]) {
+                        result += symbols[i];
+                        num -= values[i];
+                    }
+                }
+                return result;
+            }
+
+            toRomanDetailed(num) {
+                if (num < 1 || num > 3999) return { roman: '', steps: [] };
+
+                const values = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
+                const symbols = ['M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I'];
+                const colors = ['#e74c3c', '#e67e22', '#f39c12', '#f1c40f', '#2ecc71', '#1abc9c', '#3498db', '#9b59b6', '#e91e63', '#ff5722', '#795548', '#607d8b', '#34495e'];
+
+                let result = '';
+                let steps = [];
+                let remaining = num;
+
+                for (let i = 0; i < values.length; i++) {
+                    while (remaining >= values[i]) {
+                        steps.push({
+                            symbol: symbols[i],
+                            value: values[i],
+                            color: colors[i % colors.length]
+                        });
+                        result += symbols[i];
+                        remaining -= values[i];
+                    }
+                }
+                return { roman: result, steps: steps };
+            }
+
+            toArabic(roman) {
+                const romanMap = {
+                    'I': 1, 'V': 5, 'X': 10, 'L': 50,
+                    'C': 100, 'D': 500, 'M': 1000
+                };
+
+                roman = roman.toUpperCase();
+                let result = 0;
+
+                for (let i = 0; i < roman.length; i++) {
+                    const current = romanMap[roman[i]];
+                    const next = romanMap[roman[i + 1]];
+
+                    if (next && current < next) {
+                        result -= current;
+                    } else {
+                        result += current;
+                    }
+                }
+                return result;
+            }
+
+            toArabicDetailed(roman) {
+                const romanMap = {
+                    'I': 1, 'V': 5, 'X': 10, 'L': 50,
+                    'C': 100, 'D': 500, 'M': 1000
+                };
+
+                const colors = ['#e74c3c', '#e67e22', '#f39c12', '#2ecc71', '#1abc9c', '#3498db', '#9b59b6', '#e91e63', '#ff5722', '#795548', '#607d8b', '#34495e'];
+
+                roman = roman.toUpperCase();
+                let result = 0;
+                let steps = [];
+
+                for (let i = 0; i < roman.length; i++) {
+                    const current = romanMap[roman[i]];
+                    const next = romanMap[roman[i + 1]];
+
+                    if (next && current < next) {
+                        steps.push({
+                            symbol: roman[i],
+                            value: current,
+                            operation: '-',
+                            color: colors[i % colors.length]
+                        });
+                        result -= current;
+                    } else {
+                        steps.push({
+                            symbol: roman[i],
+                            value: current,
+                            operation: '+',
+                            color: colors[i % colors.length]
+                        });
+                        result += current;
+                    }
+                }
+                return { arabic: result, steps: steps };
+            }
+
+            startGame() {
+                this.currentQuestion = 0;
+                this.score = 0;
+
+                this.elements.settings.style.display = 'none';
+                this.elements.gameArea.classList.add('active');
+                this.elements.gameOver.classList.remove('show');
+
+                this.nextQuestion();
+            }
+
+            nextQuestion() {
+                this.currentQuestion++;
+
+                if (this.currentQuestion > this.totalQuestions) {
+                    this.endGame();
+                    return;
+                }
+
+                // Générer un nombre aléatoire selon la difficulté
+                const range = this.difficultyRanges[this.difficulty];
+                this.currentNumber = Math.floor(Math.random() * (range.max - range.min + 1)) + range.min;
+
+                // Choisir aléatoirement le type de question
+                this.questionType = Math.random() < 0.5 ? 'toRoman' : 'toArabic';
+
+                // Afficher la question
+                if (this.questionType === 'toRoman') {
+                    this.elements.questionNumber.textContent = this.currentNumber;
+                    this.elements.instruction.textContent = 'Convertir en chiffres romains';
+                    this.currentAnswer = this.toRoman(this.currentNumber);
+                } else {
+                    this.currentAnswer = this.toRoman(this.currentNumber);
+                    this.elements.questionNumber.textContent = this.currentAnswer;
+                    this.elements.instruction.textContent = 'Convertir en chiffres arabes';
+                }
+
+                // Réinitialiser l'interface
+                this.elements.answerInput.value = '';
+                this.elements.answerInput.focus();
+                this.elements.answerInput.disabled = false;
+                this.elements.feedback.classList.remove('show', 'correct', 'incorrect');
+                this.elements.validateBtn.style.display = '';
+                this.elements.validateBtn.disabled = false;
+                this.elements.nextBtn.style.display = 'none';
+
+                // Mettre à jour les statistiques
+                this.elements.currentQuestionDisplay.textContent = this.currentQuestion;
+                this.elements.scoreDisplay.textContent = this.score;
+            }
+
+            createExplanation(questionType, number) {
+                let html = '<div class="explanation"><div class="explanation-title">Explication :</div>';
+
+                if (questionType === 'toRoman') {
+                    // Arabe vers Romain
+                    const detailed = this.toRomanDetailed(number);
+
+                    // Afficher le nombre avec couleurs
+                    html += '<div class="highlighted-number">';
+                    detailed.steps.forEach((step, index) => {
+                        html += `<span style="color: ${step.color}">${step.symbol}</span>`;
+                    });
+                    html += '</div>';
+
+                    // Afficher le calcul
+                    html += '<div class="calculation">';
+                    html += number + ' = ';
+                    detailed.steps.forEach((step, index) => {
+                        if (index > 0) html += ' + ';
+                        html += `<span style="color: ${step.color}">${step.symbol} (${step.value})</span>`;
+                    });
+                    html += '</div>';
+
+                } else {
+                    // Romain vers Arabe
+                    const roman = this.toRoman(number);
+                    const detailed = this.toArabicDetailed(roman);
+
+                    // Afficher le nombre romain avec couleurs
+                    html += '<div class="highlighted-number">';
+                    detailed.steps.forEach((step, index) => {
+                        html += `<span style="color: ${step.color}">${step.symbol}</span>`;
+                    });
+                    html += '</div>';
+
+                    // Afficher le calcul
+                    html += '<div class="calculation">';
+                    let runningTotal = 0;
+                    detailed.steps.forEach((step, index) => {
+                        if (index > 0) html += ' ';
+                        html += `<span style="color: ${step.color}">${step.operation} ${step.symbol} (${step.value})</span>`;
+                        if (step.operation === '+') {
+                            runningTotal += step.value;
+                        } else {
+                            runningTotal -= step.value;
+                        }
+                    });
+                    html += ` = ${runningTotal}`;
+                    html += '</div>';
+                }
+
+                html += '</div>';
+                return html;
+            }
+
+            validateAnswer() {
+                const userAnswer = this.elements.answerInput.value.trim().toUpperCase();
+
+                if (!userAnswer) {
+                    alert('Veuillez entrer une réponse');
+                    return;
+                }
+
+                let isCorrect = false;
+
+                if (this.questionType === 'toRoman') {
+                    isCorrect = userAnswer === this.currentAnswer;
+                } else {
+                    isCorrect = parseInt(userAnswer) === this.currentNumber;
+                }
+
+                // Désactiver l'input et le bouton valider
+                this.elements.answerInput.disabled = true;
+                this.elements.validateBtn.style.display = 'none';
+                this.elements.nextBtn.style.display = '';
+
+                // Afficher le feedback
+                this.elements.feedback.classList.add('show');
+
+                if (isCorrect) {
+                    this.score++;
+                    this.elements.feedback.classList.add('correct');
+                    this.elements.feedbackText.textContent = '✓ Correct !';
+                    this.elements.answerDisplay.innerHTML = this.createExplanation(this.questionType, this.currentNumber);
+                } else {
+                    this.elements.feedback.classList.add('incorrect');
+                    this.elements.feedbackText.textContent = '✗ Incorrect';
+
+                    if (this.questionType === 'toRoman') {
+                        this.elements.answerDisplay.innerHTML = `<strong>La bonne réponse est : ${this.currentAnswer}</strong>` + this.createExplanation(this.questionType, this.currentNumber);
+                    } else {
+                        this.elements.answerDisplay.innerHTML = `<strong>La bonne réponse est : ${this.currentNumber}</strong>` + this.createExplanation(this.questionType, this.currentNumber);
+                    }
+                }
+
+                // Mettre à jour le score
+                this.elements.scoreDisplay.textContent = this.score;
+            }
+
+            endGame() {
+                this.elements.gameArea.querySelector('.stats').style.display = 'none';
+                this.elements.gameArea.querySelector('.question-box').style.display = 'none';
+                this.elements.gameArea.querySelector('.input-group').style.display = 'none';
+                this.elements.validateBtn.style.display = 'none';
+                this.elements.feedback.classList.remove('show');
+
+                this.elements.gameOver.classList.add('show');
+                this.elements.finalScore.textContent = `${this.score} / ${this.totalQuestions}`;
+            }
+
+            restartGame() {
+                this.elements.gameArea.querySelector('.stats').style.display = '';
+                this.elements.gameArea.querySelector('.question-box').style.display = '';
+                this.elements.gameArea.querySelector('.input-group').style.display = '';
+                this.elements.validateBtn.style.display = '';
+
+                this.elements.settings.style.display = 'block';
+                this.elements.gameArea.classList.remove('active');
+            }
+        }
+
+        // Initialiser le jeu
+        const game = new RomanNumeralGame();
+    </script>
+</body>
+</html>
